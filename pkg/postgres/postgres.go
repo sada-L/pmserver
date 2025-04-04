@@ -1,23 +1,27 @@
 package postgres
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
-func NewPostgres(url string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", url)
+type DB struct {
+	*sqlx.DB
+}
+
+func Open(url string) (*DB, error) {
+	db, err := sqlx.Open("postgres", url)
 	if err != nil {
-		return nil, fmt.Errorf("postgres - NewPostgres - sql.Open: %w", err)
+		return nil, fmt.Errorf("postgres - Open - sqlx.Open: %w", err)
 	}
 
 	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("postgres - NewPostgres - db.Ping: %w", err)
+		return nil, fmt.Errorf("postgres - Open - db.Ping: %w", err)
 	}
 
-	log.Print("Connect to datebase successes")
-	return db, nil
+	log.Println("connect to datebase successes")
+	return &DB{db}, nil
 }

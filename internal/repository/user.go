@@ -2,17 +2,17 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	"github.com/sada-L/pmserver/internal/model"
+	"github.com/sada-L/pmserver/pkg/postgres"
 )
 
 type userRepository struct {
-	db *sql.DB
+	db *postgres.DB
 }
 
-func NewUserRepository(db *sql.DB) model.UserRepository {
+func NewUserRepository(db *postgres.DB) model.UserRepository {
 	return &userRepository{db: db}
 }
 

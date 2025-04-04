@@ -11,7 +11,7 @@ import (
 )
 
 func Run(cfg *config.Config) {
-	db, err := postgres.NewPostgres(cfg.DB.URL)
+	db, err := postgres.Open(cfg.DB.URL)
 	if err != nil {
 		log.Fatal(fmt.Errorf("app - Run - postgres.NewPostgres: %w", err))
 	}
