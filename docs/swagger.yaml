@@ -1,0 +1,128 @@
+basePath: /v1
+definitions:
+  model.Card:
+    properties:
+      groupId:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      url:
+        type: string
+      userId:
+        type: integer
+      userName:
+        type: string
+    type: object
+  model.Group:
+    properties:
+      cards:
+        items:
+          $ref: '#/definitions/model.Card'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      userId:
+        type: integer
+    type: object
+  model.User:
+    properties:
+      cards:
+        items:
+          $ref: '#/definitions/model.Card'
+        type: array
+      email:
+        type: string
+      groups:
+        items:
+          $ref: '#/definitions/model.Group'
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Using a translation service as an example
+  title: Go Clean Template API
+  version: "1.0"
+paths:
+  /login:
+    post:
+      description: Авторизация по логину и паролю.
+      parameters:
+      - description: Email
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: Password
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Авторизация.
+      tags:
+      - Auth
+  /signup:
+    post:
+      description: Signup
+      parameters:
+      - description: Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Email
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: Password
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Signup.
+      tags:
+      - Auth
+swagger: "2.0"
