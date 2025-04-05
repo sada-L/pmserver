@@ -8,26 +8,21 @@ import (
 )
 
 type userRepository struct {
-	db *postgres.DB
+	q postgres.Querier
 }
 
-func NewUserRepository(db *postgres.DB) model.UserRepository {
-	return &userRepository{db: db}
+func NewUserRepository(q postgres.Querier) model.UserRepository {
+	return &userRepository{q: q}
 }
 
 func (ur *userRepository) CreateUser(ctx context.Context, user *model.User) error {
 	query := `
     INSERT INTO users (name, email, password)
-    VALUES ($1,$2,$3)
-    RETURNING id
+    VALUES ($1,$2,$3) RETURNING id
   `
 
 	args := []interface{}{user.Name, user.Email, user.Password}
-	return ur.db.QueryRowContext(
-		ctx,
-		query,
-		args,
-	).Scan(&user.Id)
+	return ur.q.QueryRowContext(ctx, query, args...).Scan(&user.Id)
 }
 
 func (r *userRepository) UpdateUser(ctx context.Context, user *model.User) error {
@@ -46,7 +41,7 @@ func (r *userRepository) UserByEmail(ctx context.Context, email string) (*model.
   `
 
 	user := &model.User{}
-	err := r.db.QueryRowContext(ctx, userQuery, email).Scan(
+	err := r.q.QueryRowContext(ctx, userQuery, email).Scan(
 		&user.Id,
 		&user.Name,
 		&user.Email,

@@ -5,7 +5,6 @@ import (
 	_ "github.com/sada-L/pmserver/docs"
 	"github.com/sada-L/pmserver/internal/infrastructure/http/v1/controller"
 	"github.com/sada-L/pmserver/internal/infrastructure/http/v1/router"
-	"github.com/sada-L/pmserver/internal/repository"
 	"github.com/sada-L/pmserver/internal/service"
 	"github.com/sada-L/pmserver/pkg/httpserver"
 	"github.com/sada-L/pmserver/pkg/postgres"
@@ -20,7 +19,7 @@ import (
 //	@host			localhost:8080
 //	@BasePath		/v1
 func Setup(cfg *config.Config, db *postgres.DB, s *httpserver.Server) {
-	uc := controller.NewUserController(service.NewUserService(repository.NewUserRepository(db)))
+	uc := controller.NewUserController(service.NewUserService(db))
 
 	publicRouter := s.App.Group("/v1")
 	router.NewUserRouter(uc, publicRouter)
