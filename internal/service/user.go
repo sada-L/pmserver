@@ -2,33 +2,34 @@ package service
 
 import (
 	"context"
-	"time"
 
 	"github.com/sada-L/pmserver/internal/model"
 )
 
 type userService struct {
-	UserRepository model.UserRepository
+	ur model.UserRepository
 }
 
-func NewUserService(r model.UserRepository) model.UserService {
-	return &userService{UserRepository: r}
+func NewUserService(ur model.UserRepository) model.UserService {
+	return &userService{ur: ur}
 }
 
-func (s *userService) Create(ctx context.Context, user *model.User) error {
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
-	return s.UserRepository.Create(ctx, user)
+func (us *userService) Authenticate(ctx context.Context, email, password string) (*model.User, error) {
+	return nil, nil
 }
 
-func (s *userService) Update(ctx context.Context, user *model.User) error {
-	return s.UserRepository.Update(ctx, user)
+func (us *userService) CreateUser(ctx context.Context, user *model.User) error {
+	return us.ur.CreateUser(ctx, user)
 }
 
-func (s *userService) Delete(ctx context.Context, id uint) error {
-	return s.UserRepository.Delete(ctx, id)
+func (us *userService) UpdateUser(ctx context.Context, user *model.User) error {
+	return us.ur.UpdateUser(ctx, user)
 }
 
-func (s *userService) GetByEmail(ctx context.Context, email string) (*model.User, error) {
-	return s.UserRepository.GetByEmail(ctx, email)
+func (us *userService) DeleteUser(ctx context.Context, id uint) error {
+	return us.ur.DeleteUser(ctx, id)
+}
+
+func (us *userService) UserByEmail(ctx context.Context, email string) (*model.User, error) {
+	return us.ur.UserByEmail(ctx, email)
 }

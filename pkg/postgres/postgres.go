@@ -1,21 +1,21 @@
 package postgres
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
 type DB struct {
-	*sqlx.DB
+	*sql.DB
 }
 
 func Open(url string) (*DB, error) {
-	db, err := sqlx.Open("postgres", url)
+	db, err := sql.Open("postgres", url)
 	if err != nil {
-		return nil, fmt.Errorf("postgres - Open - sqlx.Open: %w", err)
+		return nil, fmt.Errorf("postgres - Open - sql.Open: %w", err)
 	}
 
 	if err := db.Ping(); err != nil {

@@ -44,7 +44,7 @@ func (c *UserController) Login(ctx *gin.Context) {
 		return
 	}
 
-	user, err := c.UserService.GetByEmail(ctx, request.Email)
+	user, err := c.UserService.UserByEmail(ctx, request.Email)
 	if err != nil {
 		log.Print(fmt.Errorf("user not found: %w", err))
 		ctx.JSON(http.StatusBadRequest, gin.H{"Message": err})
@@ -89,7 +89,7 @@ func (c *UserController) Signup(ctx *gin.Context) {
 		Password: request.Password,
 	}
 
-	err = c.UserService.Create(ctx, user)
+	err = c.UserService.CreateUser(ctx, user)
 	if err != nil {
 		log.Print(fmt.Errorf("server error: %w", err))
 		ctx.JSON(http.StatusInternalServerError, gin.H{"Message": err})

@@ -14,15 +14,16 @@ type User struct {
 }
 
 type UserRepository interface {
-	Create(ctx context.Context, user *User) error
-	Update(ctx context.Context, user *User) error
-	Delete(ctx context.Context, id uint) error
-	GetByEmail(ctx context.Context, email string) (*User, error)
+	CreateUser(context.Context, *User) error
+	UpdateUser(context.Context, *User) error
+	DeleteUser(context.Context, uint) error
+	UserByEmail(context.Context, string) (*User, error)
 }
 
 type UserService interface {
-	Create(ctx context.Context, user *User) error
-	Update(ctx context.Context, user *User) error
-	Delete(ctx context.Context, id uint) error
-	GetByEmail(ctx context.Context, email string) (*User, error)
+	Authenticate(ctx context.Context, email, password string) (*User, error)
+	CreateUser(context.Context, *User) error
+	UpdateUser(context.Context, *User) error
+	DeleteUser(context.Context, uint) error
+	UserByEmail(context.Context, string) (*User, error)
 }

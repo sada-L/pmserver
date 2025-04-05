@@ -13,7 +13,7 @@ import (
 func Run(cfg *config.Config) {
 	db, err := postgres.Open(cfg.DB.URL)
 	if err != nil {
-		log.Fatal(fmt.Errorf("app - Run - postgres.NewPostgres: %w", err))
+		log.Fatal(fmt.Errorf("app - Run - postgres.Open: %w", err))
 	}
 	defer db.Close()
 
