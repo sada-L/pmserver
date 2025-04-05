@@ -1,27 +1,41 @@
 package v1
 
 import (
+	"os"
+
+	"github.com/rs/cors"
 	"github.com/sada-L/pmserver/config"
-	_ "github.com/sada-L/pmserver/docs"
+	"github.com/sada-L/pmserver/internal/infrastructure/http/middleware"
 	"github.com/sada-L/pmserver/internal/infrastructure/http/v1/controller"
 	"github.com/sada-L/pmserver/internal/infrastructure/http/v1/router"
 	"github.com/sada-L/pmserver/internal/service"
-	"github.com/sada-L/pmserver/pkg/httpserver"
 	"github.com/sada-L/pmserver/pkg/postgres"
+	"github.com/sada-L/pmserver/pkg/server"
 )
 
-// NewRouter -.
-// Swagger spec:
-//
-//	@title			Go Clean Template API
-//	@description	Using a translation service as an example
-//	@version		1.0
-//	@host			localhost:8080
-//	@BasePath		/v1
-func Setup(cfg *config.Config, db *postgres.DB, s *httpserver.Server) {
-	uc := controller.NewUserController(service.NewUserService(db))
+func Setup(cfg *config.Config, db *postgres.DB, s *server.Server) {
+	s.Router.Use(cors.AllowAll().Handler)
+	s.Router.Use(middleware.Logger(os.Stdout))
 
-	publicRouter := s.App.Group("/v1")
-	router.NewUserRouter(uc, publicRouter)
-	router.NewSwaggerRouter(publicRouter)
+	us := service.NewUserService(db)
+	uc := controller.NewUserController(us)
+
+	apiRouter := s.Router.PathPrefix("/api/v1").Subrouter()
+
+	// puglic routes
+	noAuth := apiRouter.PathPrefix("").Subrouter()
+	router.NewHealthRouter(noAuth)
+	router.NewPublicUserRouter(uc, noAuth)
+
+	// optional routes
+	// optinalAuth := apiRouter.PathPrefix("").Subrouter()
+	// optionalAuth.Use(middleware.AuthenticateMwf(us))
+	//
+	// // private routes
+	// authApiRoutes := apiRouter.PathPrefix("").Subrouter()
+	// authApiRoutes.Use(middleware.AuthenticateMwf(us))
+	//
+	// router.NewUserRouter(uc, publicRouter)
+	// router.NewSwaggerRouter(publicRouter)
+	s.Server.Handler = s.Router
 }
