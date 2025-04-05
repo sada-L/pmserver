@@ -25,10 +25,6 @@ compose-down: ### Down docker compose
 	$(BASE_STACK) down --remove-orphans
 .PHONY: compose-down
 
-swag-v1: ### swag init
-	swag init -g internal/infrastructure/http/v1/router.go
-.PHONY: swag-v1
-
 deps: ### deps tidy + verify
 	go mod tidy && go mod verify
 .PHONY: deps
@@ -42,7 +38,7 @@ format: ### Run code formatter
 	gci write . --skip-generated -s standard -s default
 .PHONY: format
 
-run: deps swag-v1 ### swag run for API v1
+run: deps ###
 	go mod download && \
 	CGO_ENABLED=0 go run -tags migrate ./cmd/app
 .PHONY: run
