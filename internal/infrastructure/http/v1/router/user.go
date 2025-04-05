@@ -1,11 +1,11 @@
 package router
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/gorilla/mux"
 	"github.com/sada-L/pmserver/internal/infrastructure/http/v1/controller"
 )
 
-func NewUserRouter(uc *controller.UserController, g *gin.RouterGroup) {
-	g.POST("/login", uc.Login)
-	g.POST("/signup", uc.Signup)
+func NewPublicUserRouter(uc *controller.UserController, r *mux.Router) {
+	r.Handle("/users/login", uc.LoginUser()).Methods("POST")
+	r.Handle("/users/create", uc.CreateUser()).Methods("POST")
 }
