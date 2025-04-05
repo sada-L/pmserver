@@ -29,7 +29,8 @@ func ValidationError(w http.ResponseWriter, _err error) {
 }
 
 func BadRequestError(w http.ResponseWriter) {
-	ErrorResponse(w, http.StatusUnprocessableEntity, "unable to process request")
+	msg := "unable to process request"
+	ErrorResponse(w, http.StatusUnprocessableEntity, msg)
 }
 
 func InvalidUserCredentialsError(w http.ResponseWriter) {
