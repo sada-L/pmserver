@@ -6,8 +6,8 @@ import (
 
 	"github.com/sada-L/pmserver/config"
 	v1 "github.com/sada-L/pmserver/internal/infrastructure/http/v1"
-	"github.com/sada-L/pmserver/pkg/httpserver"
 	"github.com/sada-L/pmserver/pkg/postgres"
+	"github.com/sada-L/pmserver/pkg/server"
 )
 
 func Run(cfg *config.Config) {
@@ -17,8 +17,8 @@ func Run(cfg *config.Config) {
 	}
 	defer db.Close()
 
-	s := httpserver.NewServer(cfg.Http.Port)
-	v1.Setup(cfg, db, s)
+	srv := server.NewServer()
+	v1.Setup(cfg, db, srv)
 
-	s.Run()
+	log.Fatal(srv.Run(cfg.Http.Port))
 }
