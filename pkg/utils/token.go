@@ -1,11 +1,12 @@
 package utils
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/golang-jwt/jwt"
 	"github.com/sada-L/pmserver/internal/model"
 )
-
-var hmacSampleSecret = []byte("sample-secret")
 
 func GenerateUserToken(user *model.User) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -13,9 +14,9 @@ func GenerateUserToken(user *model.User) (string, error) {
 		"email": user.Email,
 	})
 
-	tokenString, err := token.SignedString(hmacSampleSecret)
+	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("token - GenUserToken - SignedString: %w", err)
 	}
 
 	return tokenString, nil
@@ -27,10 +28,10 @@ func ParseUserToken(tokenStr string) (userClaims M, err error) {
 			return nil, model.ErrUnAuthorized
 		}
 
-		return hmacSampleSecret, nil
+		return []byte(os.Getenv("SECRET")), nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("token - ParsUserToken - jwt.Parse: %w", err)
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
