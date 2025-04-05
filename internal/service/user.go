@@ -18,7 +18,17 @@ func NewUserService(db *postgres.DB) model.UserService {
 }
 
 func (us *userService) Authenticate(ctx context.Context, email, password string) (*model.User, error) {
-	return nil, nil
+	uc := repository.NewUserRepository(us.db)
+	user, err := uc.UserByEmail(ctx, email)
+	if err != nil {
+		return nil, fmt.Errorf("userService - Authenticate - ur.UserByEmail: %w", err)
+	}
+
+	if !user.VerifyPassword(password) {
+		return nil, model.ErrUnAuthorized
+	}
+
+	return user, nil
 }
 
 func (us *userService) CreateUser(ctx context.Context, user *model.User) error {
