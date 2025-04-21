@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/sada-L/pmserver/internal/model"
@@ -24,4 +25,29 @@ func (r cardRepository) Update(card *model.Card) error {
 
 func (r cardRepository) Delete(id uint) error {
 	return nil
+}
+
+func (r cardRepository) CardsByUser(ctx context.Context, user *model.User) (*[]model.Card, error) {
+	cardQuery := `SELECT * FROM cards WHERE user_id = $1`
+
+	var cards []model.Card
+	rows, err := r.db.QueryContext(ctx, cardQuery, user.Id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var card model.Card
+		err := rows.Scan(card.Id, card.Name, card.UserName, card.GroupId, card.Password, card.Url)
+		if err != nil {
+			return nil, err
+		}
+		cards = append(cards, card)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return &cards, nil
 }
