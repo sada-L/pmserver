@@ -1,15 +1,18 @@
 package service
 
-import "github.com/sada-L/pmserver/internal/model"
+import (
+	"context"
+	"github.com/sada-L/pmserver/internal/model"
+)
 
 type cardService struct {
-  CardRepository *model.CardRepository  
+	cr *model.CardRepository
 }
 
-func NewCardService(r *model.CardRepository) model.CardService  {
-  return &cardService{CardRepository: r} 
+func NewCardService(cr *model.CardRepository) model.CardService {
+	return &cardService{cr: cr}
 }
 
-func (s cardService) Create()  {
-  
+func (cs *cardService) CardsByUserId(ctx context.Context, id string) (*[]model.Card, error) {
+	return nil, nil
 }

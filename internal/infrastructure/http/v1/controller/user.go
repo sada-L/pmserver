@@ -59,6 +59,7 @@ func (uc *UserController) CreateUser() http.HandlerFunc {
 
 		if err := utils.ReadJSON(r.Body, input); err != nil {
 			utils.ErrorResponse(w, http.StatusUnprocessableEntity, err)
+			return
 		}
 
 		user := model.User{
@@ -95,21 +96,12 @@ func (uc *UserController) CreateUser() http.HandlerFunc {
 	}
 }
 
-func (uc *UserController) GetUserByEmail() http.HandlerFunc {
-	type Input struct {
-		Email string `json:"email" validate:"required,email"`
-	}
-
+func (uc *UserController) GetCurrentUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		input := &Input{}
-
-		if err := utils.ReadJSON(r.Body, input); err != nil {
-			utils.ErrorResponse(w, http.StatusUnprocessableEntity, err)
-		}
-
-		user, err := uc.us.UserByEmail(r.Context(), input.Email)
-		if err != nil || user == nil {
-			utils.InvalidUserCredentialsError(w)
+		ctx := r.Context()
+		user := utils.UserFromContext(ctx)
+		if user == nil {
+			utils.ErrorResponse(w, http.StatusUnauthorized, errors.New("unauthorized"))
 			return
 		}
 

@@ -1,25 +1,21 @@
 package model
 
+import "context"
+
 type Card struct {
-	Id       uint
+	Id       string
 	Name     string
 	UserName string
 	Url      string
 	Password string
-	UserId   uint
-	GroupId  uint
+	UserId   string
+	GroupId  string
 }
 
 type CardRepository interface {
-	Create(card *Card) error
-	Update(card *Card) error
-	Delete(id uint) error
+	ByUserId(context.Context, string) (*[]Card, error)
 }
 
 type CardService interface {
-	Create()
-}
-
-type CardController interface {
-	Create()
+	CardsByUserId(context.Context, string) (*[]Card, error)
 }

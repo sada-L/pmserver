@@ -9,3 +9,7 @@ func NewPublicUserRouter(uc *controller.UserController, r *mux.Router) {
 	r.Handle("/users/login", uc.LoginUser()).Methods("POST")
 	r.Handle("/users/create", uc.CreateUser()).Methods("POST")
 }
+
+func NewPrivateUserRouter(uc *controller.UserController, r *mux.Router) {
+	r.Handle("/users/current", uc.GetCurrentUser()).Methods("GET")
+}

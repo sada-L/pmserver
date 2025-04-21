@@ -16,7 +16,7 @@ func NewUserRepository(q postgres.Querier) model.UserRepository {
 	return &userRepository{q: q}
 }
 
-func (ur *userRepository) CreateUser(ctx context.Context, user *model.User) error {
+func (ur *userRepository) Create(ctx context.Context, user *model.User) error {
 	query := `INSERT INTO users (username, email, password_hash) VALUES ($1,$2,$3) RETURNING id `
 
 	args := []interface{}{user.Username, user.Email, user.PasswordHash}
@@ -34,15 +34,15 @@ func (ur *userRepository) CreateUser(ctx context.Context, user *model.User) erro
 	return nil
 }
 
-func (r *userRepository) UpdateUser(ctx context.Context, user *model.User) error {
+func (r *userRepository) Update(ctx context.Context, user *model.User) error {
 	return nil
 }
 
-func (r *userRepository) DeleteUser(ctx context.Context, id uint) error {
+func (r *userRepository) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (r *userRepository) UserByEmail(ctx context.Context, email string) (*model.User, error) {
+func (r *userRepository) ByEmail(ctx context.Context, email string) (*model.User, error) {
 	userQuery := ` SELECT id, username, email, password_hash FROM users WHERE email = $1 `
 
 	user := &model.User{}

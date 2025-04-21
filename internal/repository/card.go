@@ -27,11 +27,11 @@ func (r cardRepository) Delete(id uint) error {
 	return nil
 }
 
-func (r cardRepository) CardsByUser(ctx context.Context, user *model.User) (*[]model.Card, error) {
+func (r *cardRepository) ByUserId(ctx context.Context, userId string) (*[]model.Card, error) {
 	cardQuery := `SELECT * FROM cards WHERE user_id = $1`
 
 	var cards []model.Card
-	rows, err := r.db.QueryContext(ctx, cardQuery, user.Id)
+	rows, err := r.db.QueryContext(ctx, cardQuery, userId)
 	if err != nil {
 		return nil, err
 	}

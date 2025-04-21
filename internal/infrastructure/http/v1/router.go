@@ -31,9 +31,10 @@ func Setup(cfg *config.Config, db *postgres.DB, s *server.Server) {
 	// optinalAuth := apiRouter.PathPrefix("").Subrouter()
 	// optionalAuth.Use(middleware.AuthenticateMwf(us))
 	//
-	// // private routes
-	// authApiRoutes := apiRouter.PathPrefix("").Subrouter()
-	// authApiRoutes.Use(middleware.AuthenticateMwf(us))
+	// private routes
+	authApiRoutes := apiRouter.PathPrefix("").Subrouter()
+	authApiRoutes.Use(middleware.AuthenticateMwf(us))
+	router.NewPrivateUserRouter(uc, authApiRoutes)
 	//
 	// router.NewUserRouter(uc, publicRouter)
 	// router.NewSwaggerRouter(publicRouter)
