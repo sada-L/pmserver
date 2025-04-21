@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"github.com/sada-L/pmserver/internal/model"
 	"github.com/sada-L/pmserver/pkg/utils"
 )
@@ -18,14 +17,10 @@ func NewUserController(us model.UserService) *UserController {
 	return &UserController{us: us}
 }
 
-var validate *validator.Validate
-
 func (uc *UserController) LoginUser() http.HandlerFunc {
 	type Input struct {
-		User struct {
-			Email    string `json:"email"`
-			Password string `json:"password"`
-		} `json:"user"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +31,7 @@ func (uc *UserController) LoginUser() http.HandlerFunc {
 			return
 		}
 
-		user, err := uc.us.Authenticate(r.Context(), input.User.Email, input.User.Password)
+		user, err := uc.us.Authenticate(r.Context(), input.Email, input.Password)
 		if err != nil || user == nil {
 			utils.InvalidUserCredentialsError(w)
 			return
@@ -48,19 +43,15 @@ func (uc *UserController) LoginUser() http.HandlerFunc {
 			return
 		}
 
-		user.Token = token
-
-		utils.WriteJSON(w, http.StatusOK, utils.M{"user": user})
+		utils.WriteJSON(w, http.StatusOK, token)
 	}
 }
 
 func (uc *UserController) CreateUser() http.HandlerFunc {
 	type Input struct {
-		User struct {
-			Email    string `json:"email" validate:"required,email"`
-			Username string `json:"username" validate:"required,min=2"`
-			Password string `json:"password" validate:"required,min=8,max=72"`
-		} `json:"user" validate:"required"`
+		Email    string `json:"email" validate:"required,email"`
+		Username string `json:"username" validate:"required,min=2"`
+		Password string `json:"password" validate:"required,min=8,max=72"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -70,17 +61,14 @@ func (uc *UserController) CreateUser() http.HandlerFunc {
 			utils.ErrorResponse(w, http.StatusUnprocessableEntity, err)
 		}
 
-		// if err := validate.Struct(input.User); err != nil {
-		// 	utils.ValidationError(w, err)
-		// 	return
-		// }
-
 		user := model.User{
-			Email:    input.User.Email,
-			Username: input.User.Username,
+			Email:    input.Email,
+			Username: input.Username,
 		}
 
-		user.SetPassword(input.User.Password)
+		if err := user.SetPassword(input.Password); err != nil {
+			utils.ErrorResponse(w, http.StatusUnprocessableEntity, err)
+		}
 
 		if err := uc.us.CreateUser(r.Context(), &user); err != nil {
 			switch {
@@ -97,12 +85,39 @@ func (uc *UserController) CreateUser() http.HandlerFunc {
 			return
 		}
 
-		utils.WriteJSON(w, http.StatusCreated, utils.M{"user": user})
+		token, err := utils.GenerateUserToken(&user)
+		if err != nil {
+			utils.ServerError(w, err)
+			return
+		}
+
+		utils.WriteJSON(w, http.StatusCreated, token)
 	}
 }
 
-func (c *UserController) DeleteUser(ctx *gin.Context) {
+func (uc *UserController) GetUserByEmail() http.HandlerFunc {
+	type Input struct {
+		Email string `json:"email" validate:"required,email"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		input := &Input{}
+
+		if err := utils.ReadJSON(r.Body, input); err != nil {
+			utils.ErrorResponse(w, http.StatusUnprocessableEntity, err)
+		}
+
+		user, err := uc.us.UserByEmail(r.Context(), input.Email)
+		if err != nil || user == nil {
+			utils.InvalidUserCredentialsError(w)
+			return
+		}
+
+		utils.WriteJSON(w, http.StatusOK, user)
+	}
+}
+func (uc *UserController) DeleteUser(ctx *gin.Context) {
 }
 
-func (c *UserController) UpdateUser(ctx *gin.Context) {
+func (uc *UserController) UpdateUser(ctx *gin.Context) {
 }
