@@ -14,7 +14,12 @@ func GenerateUserToken(user *model.User) (string, error) {
 		"email": user.Email,
 	})
 
-	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
+	key := []byte(os.Getenv("JWT_KEY"))
+	if len(key) == 0 {
+		key = []byte("JWT_KEY")
+	}
+
+	tokenString, err := token.SignedString(key)
 	if err != nil {
 		return "", fmt.Errorf("token - GenUserToken - SignedString: %w", err)
 	}
@@ -23,19 +28,22 @@ func GenerateUserToken(user *model.User) (string, error) {
 }
 
 func ParseUserToken(tokenStr string) (userClaims M, err error) {
+	key := []byte(os.Getenv("JWT_KEY"))
+	if len(key) == 0 {
+		key = []byte("JWT_KEY")
+	}
+
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, model.ErrUnAuthorized
 		}
-
-		return []byte(os.Getenv("SECRET")), nil
+		return key, nil
 	})
 	if err != nil {
 		return nil, fmt.Errorf("token - ParsUserToken - jwt.Parse: %w", err)
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
-
 	if !ok {
 		return nil, nil
 	}
