@@ -2,36 +2,36 @@ package repository
 
 import (
 	"context"
-	"database/sql"
+	"github.com/sada-L/pmserver/pkg/postgres"
 
 	"github.com/sada-L/pmserver/internal/model"
 )
 
 type cardRepository struct {
-	db *sql.DB
+	q postgres.Querier
 }
 
-func NewCardRepository(db *sql.DB) model.CardRepository {
-	return &cardRepository{db: db}
+func NewCardRepository(q postgres.Querier) model.CardRepository {
+	return &cardRepository{q: q}
 }
 
-func (r cardRepository) Create(card *model.Card) error {
+func (cr *cardRepository) Create(card *model.Card) error {
 	return nil
 }
 
-func (r cardRepository) Update(card *model.Card) error {
+func (cr *cardRepository) Update(card *model.Card) error {
 	return nil
 }
 
-func (r cardRepository) Delete(id uint) error {
+func (cr *cardRepository) Delete(id uint) error {
 	return nil
 }
 
-func (r *cardRepository) ByUserId(ctx context.Context, userId string) (*[]model.Card, error) {
-	cardQuery := `SELECT * FROM cards WHERE user_id = $1`
+func (cr *cardRepository) ByUser(ctx context.Context, user *model.User) (*[]model.Card, error) {
+	cardQuery := `SELECT id, title, username, password, website, notes, group_id, image, is_favorite FROM cards WHERE user_id = $1`
 
 	var cards []model.Card
-	rows, err := r.db.QueryContext(ctx, cardQuery, userId)
+	rows, err := cr.q.QueryContext(ctx, cardQuery, user.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -39,8 +39,16 @@ func (r *cardRepository) ByUserId(ctx context.Context, userId string) (*[]model.
 
 	for rows.Next() {
 		var card model.Card
-		err := rows.Scan(card.Id, card.Name, card.UserName, card.GroupId, card.Password, card.Url)
-		if err != nil {
+		if err = rows.Scan(
+			&card.Id,
+			&card.Title,
+			&card.Username,
+			&card.Password,
+			&card.Website,
+			&card.Notes,
+			&card.GroupId,
+			&card.Image,
+			&card.IsFavorite); err != nil {
 			return nil, err
 		}
 		cards = append(cards, card)

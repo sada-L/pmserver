@@ -14,21 +14,18 @@ func NewCardController(cs model.CardService) *CardController {
 	return &CardController{cs: cs}
 }
 
-func (cc *CardController) GetCardsByUserId() http.HandlerFunc {
-	type Input struct {
-		UserId string `json:"user_id" validate:"required"`
-	}
-
+func (cc *CardController) GetCardsByUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		input := Input{}
-
-		if err := utils.ReadJSON(r.Body, &input); err != nil {
-			utils.ErrorResponse(w, http.StatusUnprocessableEntity, err)
+		ctx := r.Context()
+		user := utils.UserFromContext(ctx)
+		if user == nil {
+			utils.ErrorResponse(w, http.StatusUnauthorized, "Unauthorized")
+			return
 		}
 
-		cards, err := cc.cs.CardsByUserId(r.Context(), input.UserId)
+		cards, err := cc.cs.CardsByUser(r.Context(), user)
 		if err != nil {
-			utils.ErrorResponse(w, http.StatusInternalServerError, err)
+			utils.ServerError(w, err)
 			return
 		}
 
