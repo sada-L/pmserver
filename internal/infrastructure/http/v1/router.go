@@ -23,6 +23,9 @@ func Setup(cfg *config.Config, db *postgres.DB, s *server.Server) {
 	cs := service.NewCardService(db)
 	cc := controller.NewCardController(cs)
 
+	gs := service.NewGroupService(db)
+	gc := controller.NewGroupController(gs)
+
 	apiRouter := s.Router.PathPrefix("/api/v1").Subrouter()
 
 	// puglic routes

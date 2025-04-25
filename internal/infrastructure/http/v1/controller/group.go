@@ -1,15 +1,34 @@
 package controller
 
-import "github.com/sada-L/pmserver/internal/model"
+import (
+	"github.com/sada-L/pmserver/internal/model"
+	"github.com/sada-L/pmserver/pkg/utils"
+	"net/http"
+)
 
-type groupController struct {
-  GroupService *model.GroupService 
+type GroupController struct {
+	gs model.GroupService
 }
 
-func NewGroupController(s *model.GroupService) model.GroupController {
-  return &groupController{GroupService: s} 
+func NewGroupController(gs model.GroupService) *GroupController {
+	return &GroupController{gs: gs}
 }
 
-func (c groupController) Create()  {
-  
+func (gc *GroupController) GetGroupsByUser() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		user := utils.UserFromContext(ctx)
+		if user == nil {
+			utils.ErrorResponse(w, http.StatusUnauthorized, "unauthorized")
+			return
+		}
+
+		groups, err := gc.gs.GroupsByUser(r.Context(), user)
+		if err != nil {
+			utils.ServerError(w, err)
+			return
+		}
+
+		utils.WriteJSON(w, http.StatusOK, groups)
+	}
 }

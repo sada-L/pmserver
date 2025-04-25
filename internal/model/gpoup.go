@@ -1,22 +1,21 @@
 package model
 
+import (
+	"context"
+)
+
 type Group struct {
-  Id     uint
-  Name   string
-  Cards  []Card
-  UserId uint
+	Id      uint   `json:"id"`
+	UserId  uint   `json:"-"`
+	Title   string `json:"title"`
+	Image   string `json:"image"`
+	GroupId uint   `json:"group_id"`
 }
 
-type GroupReporitory interface {
-  Create(group *Group) error
-  Update(group *Group) error
-  Delete(id uint) error
+type GroupRepository interface {
+	ByUser(context.Context, *User) (*[]Group, error)
 }
 
 type GroupService interface {
-  Create() 
-}
-
-type GroupController interface {
-  Create()
+	GroupsByUser(context.Context, *User) (*[]Group, error)
 }
