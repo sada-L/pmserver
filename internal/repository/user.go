@@ -34,24 +34,39 @@ func (ur *userRepository) Create(ctx context.Context, user *model.User) error {
 	return nil
 }
 
-func (r *userRepository) Update(ctx context.Context, user *model.User) error {
+func (ur *userRepository) Update(ctx context.Context, user *model.User) error {
 	return nil
 }
 
-func (r *userRepository) Delete(ctx context.Context, id string) error {
+func (ur *userRepository) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (r *userRepository) ByEmail(ctx context.Context, email string) (*model.User, error) {
-	userQuery := ` SELECT id, username, email, password_hash FROM users WHERE email = $1 `
+func (ur *userRepository) ById(ctx context.Context, id string) (*model.User, error) {
+	userQuery := `SELECT id, username, email, password_hash FROM users WHERE id = $1`
 
 	user := &model.User{}
-	err := r.q.QueryRowContext(ctx, userQuery, email).Scan(
+	err := ur.q.QueryRowContext(ctx, userQuery, id).Scan(
 		&user.Id,
 		&user.Username,
 		&user.Email,
-		&user.PasswordHash,
-	)
+		&user.PasswordHash)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (ur *userRepository) ByEmail(ctx context.Context, email string) (*model.User, error) {
+	userQuery := ` SELECT id, username, email, password_hash FROM users WHERE email = $1 `
+
+	user := &model.User{}
+	err := ur.q.QueryRowContext(ctx, userQuery, email).Scan(
+		&user.Id,
+		&user.Username,
+		&user.Email,
+		&user.PasswordHash)
 	if err != nil {
 		return nil, err
 	}

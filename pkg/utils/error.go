@@ -48,7 +48,7 @@ func NotFoundError(w http.ResponseWriter, err model.ErrorM) {
 	ErrorResponse(w, http.StatusNotFound, err)
 }
 
-func ServerError(w http.ResponseWriter, err error) {
+func InternalError(w http.ResponseWriter, err error) {
 	log.Println(err)
 	ErrorResponse(w, http.StatusInternalServerError, "internal error")
 }

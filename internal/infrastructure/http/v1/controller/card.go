@@ -25,7 +25,7 @@ func (cc *CardController) GetCardsByUser() http.HandlerFunc {
 
 		cards, err := cc.cs.CardsByUser(r.Context(), user)
 		if err != nil {
-			utils.ServerError(w, err)
+			utils.InternalError(w, err)
 			return
 		}
 

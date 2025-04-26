@@ -26,7 +26,6 @@ func AuthenticateMwf(us model.UserService) func(http.Handler) http.Handler {
 			}
 
 			token := ss[1]
-
 			claims, err := utils.ParseUserToken(token)
 			if err != nil {
 				utils.InvalidAuthTokenError(w)
@@ -34,10 +33,10 @@ func AuthenticateMwf(us model.UserService) func(http.Handler) http.Handler {
 			}
 
 			email := claims["email"].(string)
-
 			user, err := us.UserByEmail(r.Context(), email)
 			if err != nil {
-				utils.ServerError(w, err)
+				utils.InternalError(w, err)
+				return
 			}
 
 			r = utils.SetContextUser(r, user)

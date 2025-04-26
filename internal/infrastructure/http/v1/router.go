@@ -19,6 +19,7 @@ func Setup(cfg *config.Config, db *postgres.DB, s *server.Server) {
 
 	us := service.NewUserService(db)
 	uc := controller.NewUserController(us)
+	ac := controller.NewAuthController(us)
 
 	cs := service.NewCardService(db)
 	cc := controller.NewCardController(cs)
@@ -31,12 +32,12 @@ func Setup(cfg *config.Config, db *postgres.DB, s *server.Server) {
 	// puglic routes
 	noAuth := apiRouter.PathPrefix("").Subrouter()
 	router.NewHealthRouter(noAuth)
-	router.NewPublicUserRouter(uc, noAuth)
+	router.NewAuthRouter(ac, noAuth)
 
 	// private routes
 	authApiRoutes := apiRouter.PathPrefix("").Subrouter()
 	authApiRoutes.Use(middleware.AuthenticateMwf(us))
-	router.NewPrivateUserRouter(uc, authApiRoutes)
+	router.NewUserRouter(uc, authApiRoutes)
 	router.NewCardRouter(cc, authApiRoutes)
 	router.NewGroupRouter(gc, authApiRoutes)
 

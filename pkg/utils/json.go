@@ -11,7 +11,7 @@ func WriteJSON(w http.ResponseWriter, code int, data interface{}) {
 	jsonBytes, err := json.Marshal(data)
 	if err != nil {
 
-		ServerError(w, err)
+		InternalError(w, err)
 		return
 	}
 

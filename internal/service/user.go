@@ -17,20 +17,6 @@ func NewUserService(db *postgres.DB) model.UserService {
 	return &userService{db: db}
 }
 
-func (us *userService) Authenticate(ctx context.Context, email, password string) (*model.User, error) {
-	uc := repository.NewUserRepository(us.db)
-	user, err := uc.ByEmail(ctx, email)
-	if err != nil {
-		return nil, fmt.Errorf("userService - Authenticate - ur.UserByEmail: %w", err)
-	}
-
-	if !user.VerifyPassword(password) {
-		return nil, model.ErrUnAuthorized
-	}
-
-	return user, nil
-}
-
 func (us *userService) CreateUser(ctx context.Context, user *model.User) error {
 	tx, err := us.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -77,6 +63,16 @@ func (us *userService) DeleteUser(ctx context.Context, id string) error {
 	}
 
 	return tx.Commit()
+}
+
+func (us *userService) UserById(ctx context.Context, id string) (*model.User, error) {
+	ur := repository.NewUserRepository(us.db)
+	user, err := ur.ById(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("userService - UserById - ur.ById: %w", err)
+	}
+
+	return user, nil
 }
 
 func (us *userService) UserByEmail(ctx context.Context, email string) (*model.User, error) {

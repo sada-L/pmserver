@@ -18,14 +18,15 @@ type UserRepository interface {
 	Create(context.Context, *User) error
 	Update(context.Context, *User) error
 	Delete(context.Context, string) error
+	ById(context.Context, string) (*User, error)
 	ByEmail(context.Context, string) (*User, error)
 }
 
 type UserService interface {
-	Authenticate(ctx context.Context, email, password string) (*User, error)
 	CreateUser(context.Context, *User) error
 	UpdateUser(context.Context, *User) error
 	DeleteUser(context.Context, string) error
+	UserById(context.Context, string) (*User, error)
 	UserByEmail(context.Context, string) (*User, error)
 }
 

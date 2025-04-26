@@ -25,7 +25,7 @@ func (gc *GroupController) GetGroupsByUser() http.HandlerFunc {
 
 		groups, err := gc.gs.GroupsByUser(r.Context(), user)
 		if err != nil {
-			utils.ServerError(w, err)
+			utils.InternalError(w, err)
 			return
 		}
 
