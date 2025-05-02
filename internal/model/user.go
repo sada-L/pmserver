@@ -15,18 +15,18 @@ type User struct {
 }
 
 type UserRepository interface {
-	Create(context.Context, *User) error
+	Create(context.Context, *User) (uint, error)
 	Update(context.Context, *User) error
-	Delete(context.Context, string) error
-	ById(context.Context, string) (*User, error)
+	Delete(context.Context, uint) error
+	ById(context.Context, uint) (*User, error)
 	ByEmail(context.Context, string) (*User, error)
 }
 
 type UserService interface {
-	CreateUser(context.Context, *User) error
+	CreateUser(context.Context, *User) (uint, error)
 	UpdateUser(context.Context, *User) error
-	DeleteUser(context.Context, string) error
-	UserById(context.Context, string) (*User, error)
+	DeleteUser(context.Context, uint) error
+	UserById(context.Context, uint) (*User, error)
 	UserByEmail(context.Context, string) (*User, error)
 }
 

@@ -17,20 +17,25 @@ func NewUserService(db *postgres.DB) model.UserService {
 	return &userService{db: db}
 }
 
-func (us *userService) CreateUser(ctx context.Context, user *model.User) error {
+func (us *userService) CreateUser(ctx context.Context, user *model.User) (uint, error) {
 	tx, err := us.db.BeginTx(ctx, nil)
 	if err != nil {
-		return fmt.Errorf("userService - CreateUser - us.db.BeginTx: %w", err)
+		return 0, fmt.Errorf("userService - CreateUser - us.db.BeginTx: %w", err)
 	}
 
 	defer tx.Rollback()
 
 	ur := repository.NewUserRepository(tx)
-	if err := ur.Create(ctx, user); err != nil {
-		return fmt.Errorf("userService - CreateUser - ur.CreateUser: %w", err)
+	id, err := ur.Create(ctx, user)
+	if err != nil {
+		return 0, fmt.Errorf("userService - CreateUser - ur.CreateUser: %w", err)
 	}
 
-	return tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return 0, fmt.Errorf("userService - CreateUser - tx.Commit: %w", err)
+	}
+
+	return id, nil
 }
 
 func (us *userService) UpdateUser(ctx context.Context, user *model.User) error {
@@ -46,10 +51,14 @@ func (us *userService) UpdateUser(ctx context.Context, user *model.User) error {
 		return fmt.Errorf("userService - UpdateUser - ur.UpdateUser: %w", err)
 	}
 
-	return tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("userService - UpdateUser - tx.Commit: %w", err)
+	}
+
+	return nil
 }
 
-func (us *userService) DeleteUser(ctx context.Context, id string) error {
+func (us *userService) DeleteUser(ctx context.Context, id uint) error {
 	tx, err := us.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("userService - DeleteUser - us.db.BeginTx: %w", err)
@@ -62,10 +71,14 @@ func (us *userService) DeleteUser(ctx context.Context, id string) error {
 		return fmt.Errorf("userService - DeleteUser - ur.DeleteUser: %w", err)
 	}
 
-	return tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("userService - DeleteUser - tx.Commit: %w", err)
+	}
+
+	return nil
 }
 
-func (us *userService) UserById(ctx context.Context, id string) (*model.User, error) {
+func (us *userService) UserById(ctx context.Context, id uint) (*model.User, error) {
 	ur := repository.NewUserRepository(us.db)
 	user, err := ur.ById(ctx, id)
 	if err != nil {

@@ -16,33 +16,34 @@ func NewUserRepository(q postgres.Querier) model.UserRepository {
 	return &userRepository{q: q}
 }
 
-func (ur *userRepository) Create(ctx context.Context, user *model.User) error {
+func (ur *userRepository) Create(ctx context.Context, user *model.User) (uint, error) {
 	query := `INSERT INTO users (username, email, password_hash) VALUES ($1,$2,$3) RETURNING id `
 
+	var id uint
 	args := []interface{}{user.Username, user.Email, user.PasswordHash}
-	err := ur.q.QueryRowContext(ctx, query, args...).Scan(&user.Id)
+	err := ur.q.QueryRowContext(ctx, query, args...).Scan(id)
 	if err != nil {
 		switch {
 		case strings.Contains(err.Error(), "users_email_key"):
-			return model.ErrDuplicateEmail
+			return 0, model.ErrDuplicateEmail
 		case strings.Contains(err.Error(), "users_username_key"):
-			return model.ErrDuplicateUsername
+			return 0, model.ErrDuplicateUsername
 		default:
-			return err
+			return 0, err
 		}
 	}
-	return nil
+	return id, nil
 }
 
 func (ur *userRepository) Update(ctx context.Context, user *model.User) error {
 	return nil
 }
 
-func (ur *userRepository) Delete(ctx context.Context, id string) error {
+func (ur *userRepository) Delete(ctx context.Context, id uint) error {
 	return nil
 }
 
-func (ur *userRepository) ById(ctx context.Context, id string) (*model.User, error) {
+func (ur *userRepository) ById(ctx context.Context, id uint) (*model.User, error) {
 	userQuery := `SELECT id, username, email, password_hash FROM users WHERE id = $1`
 
 	user := &model.User{}

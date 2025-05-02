@@ -2,9 +2,10 @@ package controller
 
 import (
 	"errors"
+	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 
-	"github.com/gin-gonic/gin"
 	"github.com/sada-L/pmserver/internal/model"
 	"github.com/sada-L/pmserver/pkg/utils"
 )
@@ -30,8 +31,26 @@ func (uc *UserController) GetCurrentUser() http.HandlerFunc {
 	}
 }
 
-func (uc *UserController) DeleteUser(ctx *gin.Context) {
+func (uc *UserController) DeleteUser() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		id, err := strconv.Atoi(vars["id"])
+		if err != nil {
+			utils.ErrorResponse(w, http.StatusBadRequest, err)
+			return
+		}
+
+		if err := uc.us.DeleteUser(r.Context(), uint(id)); err != nil {
+			utils.ErrorResponse(w, http.StatusInternalServerError, err)
+			return
+		}
+
+		utils.WriteJSON(w, http.StatusNoContent, nil)
+	}
 }
 
-func (uc *UserController) UpdateUser(ctx *gin.Context) {
+func (uc *UserController) UpdateUser() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+	}
 }
