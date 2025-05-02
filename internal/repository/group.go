@@ -15,15 +15,15 @@ func NewGroupRepository(q postgres.Querier) model.GroupRepository {
 	return &groupRepository{q: q}
 }
 
-func (r groupRepository) Create(group *model.Group) error {
+func (gr *groupRepository) Create(ctx context.Context, group *model.Group) (uint, error) {
+	return 0, nil
+}
+
+func (gr *groupRepository) Update(ctx context.Context, group *model.Group) error {
 	return nil
 }
 
-func (r groupRepository) Update(group *model.Group) error {
-	return nil
-}
-
-func (r groupRepository) Delete(id uint) error {
+func (gr *groupRepository) Delete(ctx context.Context, id uint) error {
 	return nil
 }
 

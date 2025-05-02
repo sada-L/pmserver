@@ -6,5 +6,8 @@ import (
 )
 
 func NewGroupRouter(uc *controller.GroupController, r *mux.Router) {
-	r.Handle("/groups/current", uc.GetGroupsByUser()).Methods("GET")
+	r.Handle("/groups", uc.GetGroupsByUser()).Methods("GET")
+	r.Handle("/groups", uc.CreateGroup()).Methods("POST")
+	r.Handle("/groups/{id}", uc.UpdateGroup()).Methods("PUT")
+	r.Handle("/groups/{id}", uc.DeleteGroup()).Methods("DELETE")
 }

@@ -14,6 +14,24 @@ func NewGroupController(gs model.GroupService) *GroupController {
 	return &GroupController{gs: gs}
 }
 
+func (gc *GroupController) CreateGroup() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+	}
+}
+
+func (gc *GroupController) UpdateGroup() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+	}
+}
+
+func (gc *GroupController) DeleteGroup() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+	}
+}
+
 func (gc *GroupController) GetGroupsByUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
