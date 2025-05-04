@@ -5,7 +5,6 @@ import (
 	"github.com/sada-L/pmserver/internal/model"
 	"github.com/sada-L/pmserver/pkg/utils"
 	"net/http"
-	"strconv"
 )
 
 type AuthController struct {
@@ -74,7 +73,7 @@ func (ac *AuthController) Register() http.HandlerFunc {
 			return
 		}
 
-		if err := ac.us.CreateUser(r.Context(), user); err != nil {
+		if _, err := ac.us.CreateUser(r.Context(), user); err != nil {
 			switch {
 			case errors.Is(err, model.ErrDuplicateEmail):
 				err = model.ErrorM{"email": {"this email is already in use"}}
@@ -118,8 +117,7 @@ func (ac *AuthController) RefreshToken() http.HandlerFunc {
 		}
 
 		id := claims["id"].(float64)
-		sid := strconv.FormatFloat(id, 'f', -1, 64)
-		user, err := ac.us.UserById(r.Context(), sid)
+		user, err := ac.us.UserById(r.Context(), uint(id))
 		if err != nil || user == nil {
 			utils.InvalidUserCredentialsError(w)
 			return
