@@ -4,7 +4,7 @@ import "context"
 
 type Card struct {
 	Id         uint   `json:"id"`
-	UserId     string `json:"-"`
+	UserId     uint   `json:"-"`
 	GroupId    uint   `json:"group_id"`
 	Title      string `json:"title"`
 	Username   string `json:"username"`

@@ -29,7 +29,7 @@ func (cs *cardService) CreateCard(ctx context.Context, card *model.Card) (uint, 
 		return 0, fmt.Errorf("cardService - CreateCard - cr.Create: %w", err)
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err = tx.Commit(); err != nil {
 		return 0, fmt.Errorf("cardService - CreateCard - tx.Commit: %w", err)
 	}
 
@@ -44,11 +44,11 @@ func (cs *cardService) UpdateCard(ctx context.Context, card *model.Card) error {
 	defer tx.Rollback()
 
 	cr := repository.NewCardRepository(tx)
-	if err := cr.Update(ctx, card); err != nil {
+	if err = cr.Update(ctx, card); err != nil {
 		return fmt.Errorf("cardService - UpdateCard - cr.Update: %w", err)
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err = tx.Commit(); err != nil {
 		return fmt.Errorf("cardService - UpdateCard - tx.Commit: %w", err)
 	}
 
@@ -63,11 +63,11 @@ func (cs *cardService) DeleteCard(ctx context.Context, id uint) error {
 	defer tx.Rollback()
 
 	cr := repository.NewCardRepository(tx)
-	if err := cr.Delete(ctx, id); err != nil {
+	if err = cr.Delete(ctx, id); err != nil {
 		return fmt.Errorf("cardService - DeleteCard - cr.Delete: %w", err)
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err = tx.Commit(); err != nil {
 		return fmt.Errorf("cardService - DeleteCard - tx.Commit: %w", err)
 	}
 

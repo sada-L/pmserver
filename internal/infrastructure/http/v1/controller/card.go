@@ -29,6 +29,9 @@ func (cc *CardController) CreateCard() http.HandlerFunc {
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		user := utils.UserFromContext(ctx)
+
 		input := Input{}
 		if err := utils.ReadJSON(r.Body, &input); err != nil {
 			utils.BadRequestError(w)
@@ -44,11 +47,13 @@ func (cc *CardController) CreateCard() http.HandlerFunc {
 			Image:      input.Image,
 			IsFavorite: input.IsFavorite,
 			GroupId:    input.GroupId,
+			UserId:     user.Id,
 		}
 
 		id, err := cc.cs.CreateCard(r.Context(), card)
 		if err != nil {
 			utils.InternalError(w, err)
+			return
 		}
 
 		utils.WriteJSON(w, http.StatusCreated, id)
@@ -72,11 +77,13 @@ func (cc *CardController) UpdateCard() http.HandlerFunc {
 		id, err := strconv.Atoi(vars["id"])
 		if err != nil {
 			utils.BadRequestError(w)
+			return
 		}
 
 		input := Input{}
 		if err := utils.ReadJSON(r.Body, &input); err != nil {
 			utils.BadRequestError(w)
+			return
 		}
 
 		card := &model.Card{
@@ -94,9 +101,10 @@ func (cc *CardController) UpdateCard() http.HandlerFunc {
 		err = cc.cs.UpdateCard(r.Context(), card)
 		if err != nil {
 			utils.InternalError(w, err)
+			return
 		}
 
-		utils.WriteJSON(w, http.StatusNoContent, nil)
+		utils.WriteJSON(w, http.StatusOK, nil)
 	}
 }
 
@@ -114,7 +122,7 @@ func (cc *CardController) DeleteCard() http.HandlerFunc {
 			return
 		}
 
-		utils.WriteJSON(w, http.StatusNoContent, nil)
+		utils.WriteJSON(w, http.StatusOK, nil)
 	}
 }
 
