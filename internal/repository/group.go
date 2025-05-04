@@ -16,14 +16,34 @@ func NewGroupRepository(q postgres.Querier) model.GroupRepository {
 }
 
 func (gr *groupRepository) Create(ctx context.Context, group *model.Group) (uint, error) {
-	return 0, nil
+	query := `INSERT INTO groups (title, image, group_id, user_id) VALUES ($1, $2, $3, $4) RETURNING id`
+
+	args := []interface{}{group.Title, group.Image, group.GroupId, group.UserId}
+	if err := gr.q.QueryRowContext(ctx, query, args...).Scan(&group.Id); err != nil {
+		return 0, err
+	}
+
+	return group.Id, nil
 }
 
 func (gr *groupRepository) Update(ctx context.Context, group *model.Group) error {
+	query := `UPDATE groups SET title = $1, image = $2, group_id = $3 WHERE id = $4`
+
+	args := []interface{}{group.Title, group.Image, group.GroupId, group.Id}
+	if _, err := gr.q.ExecContext(ctx, query, args...); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (gr *groupRepository) Delete(ctx context.Context, id uint) error {
+	query := `DELETE FROM groups WHERE id = $1`
+
+	if err := gr.q.QueryRowContext(ctx, query, id).Err(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
