@@ -2,12 +2,9 @@ package controller
 
 import (
 	"errors"
-	"github.com/gorilla/mux"
-	"net/http"
-	"strconv"
-
 	"github.com/sada-L/pmserver/internal/model"
 	"github.com/sada-L/pmserver/pkg/utils"
+	"net/http"
 )
 
 type UserController struct {
@@ -33,15 +30,15 @@ func (uc *UserController) GetCurrentUser() http.HandlerFunc {
 
 func (uc *UserController) DeleteUser() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id, err := strconv.Atoi(vars["id"])
-		if err != nil {
-			utils.ErrorResponse(w, http.StatusBadRequest, err)
+		ctx := r.Context()
+		user := utils.UserFromContext(ctx)
+		if user == nil {
+			utils.ErrorResponse(w, http.StatusUnauthorized, errors.New("unauthorized"))
 			return
 		}
 
-		if err := uc.us.DeleteUser(r.Context(), uint(id)); err != nil {
-			utils.ErrorResponse(w, http.StatusInternalServerError, err)
+		if err := uc.us.DeleteUser(r.Context(), user.Id); err != nil {
+			utils.InternalError(w, err)
 			return
 		}
 
@@ -50,7 +47,24 @@ func (uc *UserController) DeleteUser() http.HandlerFunc {
 }
 
 func (uc *UserController) UpdateUser() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+	type Input struct {
+		Username string `json:"username"`
+		Email    string `json:"email"`
+	}
 
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		user := utils.UserFromContext(ctx)
+		if user == nil {
+			utils.ErrorResponse(w, http.StatusUnauthorized, errors.New("unauthorized"))
+			return
+		}
+
+		if err := uc.us.UpdateUser(r.Context(), user); err != nil {
+			utils.InternalError(w, err)
+			return
+		}
+
+		utils.WriteJSON(w, http.StatusNoContent, nil)
 	}
 }

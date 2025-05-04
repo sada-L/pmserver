@@ -31,7 +31,7 @@ func (us *userService) CreateUser(ctx context.Context, user *model.User) (uint, 
 		return 0, fmt.Errorf("userService - CreateUser - ur.CreateUser: %w", err)
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err = tx.Commit(); err != nil {
 		return 0, fmt.Errorf("userService - CreateUser - tx.Commit: %w", err)
 	}
 
@@ -47,11 +47,11 @@ func (us *userService) UpdateUser(ctx context.Context, user *model.User) error {
 	defer tx.Rollback()
 
 	ur := repository.NewUserRepository(tx)
-	if err := ur.Update(ctx, user); err != nil {
+	if err = ur.Update(ctx, user); err != nil {
 		return fmt.Errorf("userService - UpdateUser - ur.UpdateUser: %w", err)
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err = tx.Commit(); err != nil {
 		return fmt.Errorf("userService - UpdateUser - tx.Commit: %w", err)
 	}
 
@@ -67,11 +67,11 @@ func (us *userService) DeleteUser(ctx context.Context, id uint) error {
 	defer tx.Rollback()
 
 	ur := repository.NewUserRepository(tx)
-	if err := ur.Delete(ctx, id); err != nil {
+	if err = ur.Delete(ctx, id); err != nil {
 		return fmt.Errorf("userService - DeleteUser - ur.DeleteUser: %w", err)
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err = tx.Commit(); err != nil {
 		return fmt.Errorf("userService - DeleteUser - tx.Commit: %w", err)
 	}
 

@@ -36,10 +36,23 @@ func (ur *userRepository) Create(ctx context.Context, user *model.User) (uint, e
 }
 
 func (ur *userRepository) Update(ctx context.Context, user *model.User) error {
+	query := `UPDATE users SET username = $1, email = $2 WHERE id = $3`
+
+	args := []interface{}{user.Username, user.Email, user.Id}
+	if err := ur.q.QueryRowContext(ctx, query, args...).Err(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (ur *userRepository) Delete(ctx context.Context, id uint) error {
+	query := `DELETE FROM users WHERE id = $1`
+
+	if err := ur.q.QueryRowContext(ctx, query, id).Err(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
