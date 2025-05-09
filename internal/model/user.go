@@ -12,6 +12,7 @@ type User struct {
 	Username     string `json:"username,omitempty"`
 	Email        string `json:"email,omitempty"`
 	PasswordHash string `json:"-"`
+	Secret       string `json:"secret"`
 }
 
 type UserRepository interface {

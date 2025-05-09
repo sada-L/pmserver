@@ -5,8 +5,14 @@ import (
 	"github.com/sada-L/pmserver/internal/infrastructure/http/v1/controller"
 )
 
-func NewAuthRouter(uc *controller.AuthController, r *mux.Router) {
-	r.Handle("/auth/login", uc.Login()).Methods("POST")
-	r.Handle("/auth/register", uc.Register()).Methods("POST")
-	r.Handle("/auth/refresh", uc.RefreshToken()).Methods("POST")
+func NewAuthRouter(ac *controller.AuthController, r *mux.Router) {
+	r.Handle("/auth/login", ac.Login()).Methods("POST")
+	r.Handle("/auth/register", ac.Register()).Methods("POST")
+	r.Handle("/auth/refresh", ac.RefreshToken()).Methods("POST")
+}
+
+func NewAuth2FaRouter(ac *controller.AuthController, r *mux.Router) {
+	r.Handle("/auth/2fa/enable", ac.TwoFaEnable()).Methods("POST")
+	r.Handle("/auth/2fa/verify", ac.TwoFaVerify()).Methods("POST")
+	r.Handle("/auth/2fa/disable", ac.TwoFaDisable()).Methods("POST")
 }

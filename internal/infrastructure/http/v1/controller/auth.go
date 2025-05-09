@@ -132,3 +132,30 @@ func (ac *AuthController) RefreshToken() http.HandlerFunc {
 		utils.WriteJSON(w, http.StatusOK, authResponse)
 	}
 }
+
+func (ac *AuthController) TwoFaEnable() http.HandlerFunc {
+	type Input struct {
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+	}
+}
+
+func (ac *AuthController) TwoFaVerify() http.HandlerFunc {
+	type Input struct {
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+	}
+}
+
+func (ac *AuthController) TwoFaDisable() http.HandlerFunc {
+	type Input struct {
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+
+	}
+}
