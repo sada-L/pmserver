@@ -40,6 +40,7 @@ func Setup(cfg *config.Config, db *postgres.DB, s *server.Server) {
 	router.NewUserRouter(uc, authApiRoutes)
 	router.NewCardRouter(cc, authApiRoutes)
 	router.NewGroupRouter(gc, authApiRoutes)
+	router.NewAuth2FaRouter(ac, authApiRoutes)
 
 	s.Server.Handler = s.Router
 }

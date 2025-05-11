@@ -29,6 +29,6 @@ func Open(url string) (*DB, error) {
 		return nil, fmt.Errorf("postgres - Open - db.Ping: %w", err)
 	}
 
-	log.Println("connect to datebase successes")
+	log.Println("connect to database successes")
 	return &DB{db}, nil
 }

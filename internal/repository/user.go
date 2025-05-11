@@ -36,9 +36,9 @@ func (ur *userRepository) Create(ctx context.Context, user *model.User) (uint, e
 }
 
 func (ur *userRepository) Update(ctx context.Context, user *model.User) error {
-	query := `UPDATE users SET username = $1, email = $2 WHERE id = $3`
+	query := `UPDATE users SET username = $1, email = $2, secret = $3 WHERE id = $4`
 
-	args := []interface{}{user.Username, user.Email, user.Id}
+	args := []interface{}{user.Username, user.Email, user.Secret, user.Id}
 	if err := ur.q.QueryRowContext(ctx, query, args...).Err(); err != nil {
 		return err
 	}
@@ -73,14 +73,15 @@ func (ur *userRepository) ById(ctx context.Context, id uint) (*model.User, error
 }
 
 func (ur *userRepository) ByEmail(ctx context.Context, email string) (*model.User, error) {
-	userQuery := ` SELECT id, username, email, password_hash FROM users WHERE email = $1 `
+	userQuery := ` SELECT id, username, email, password_hash, secret FROM users WHERE email = $1 `
 
 	user := &model.User{}
 	err := ur.q.QueryRowContext(ctx, userQuery, email).Scan(
 		&user.Id,
 		&user.Username,
 		&user.Email,
-		&user.PasswordHash)
+		&user.PasswordHash,
+		&user.Secret)
 	if err != nil {
 		return nil, err
 	}

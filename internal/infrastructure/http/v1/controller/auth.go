@@ -1,10 +1,14 @@
 package controller
 
 import (
+	"crypto/rand"
+	"encoding/base32"
 	"errors"
 	"github.com/sada-L/pmserver/internal/model"
 	"github.com/sada-L/pmserver/pkg/utils"
 	"net/http"
+
+	"github.com/pquerna/otp/totp"
 )
 
 type AuthController struct {
@@ -134,28 +138,61 @@ func (ac *AuthController) RefreshToken() http.HandlerFunc {
 }
 
 func (ac *AuthController) TwoFaEnable() http.HandlerFunc {
-	type Input struct {
-	}
-
 	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		user := utils.UserFromContext(ctx)
 
+		randomBytes := make([]byte, 20)
+		_, err := rand.Read(randomBytes)
+		if err != nil {
+			utils.InternalError(w, err)
+		}
+		secret := base32.StdEncoding.EncodeToString(randomBytes)
+
+		user.Secret = secret
+		if err = ac.us.UpdateUser(ctx, user); err != nil {
+			utils.InternalError(w, err)
+		}
+
+		utils.WriteJSON(w, http.StatusOK, secret)
 	}
 }
 
 func (ac *AuthController) TwoFaVerify() http.HandlerFunc {
 	type Input struct {
+		Code string `json:"code"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		user := utils.UserFromContext(ctx)
 
+		input := &Input{}
+		if err := utils.ReadJSON(r.Body, input); err != nil {
+			utils.BadRequestError(w)
+			return
+		}
+
+		if !totp.Validate(input.Code, user.Secret) {
+			utils.BadRequestError(w)
+			return
+		}
+
+		utils.WriteJSON(w, http.StatusOK, nil)
 	}
 }
 
 func (ac *AuthController) TwoFaDisable() http.HandlerFunc {
-	type Input struct {
-	}
-
 	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		user := utils.UserFromContext(ctx)
 
+		user.Secret = ""
+		if err := ac.us.UpdateUser(ctx, user); err != nil {
+			utils.InternalError(w, err)
+			return
+		}
+
+		utils.WriteJSON(w, http.StatusOK, nil)
 	}
 }
