@@ -17,10 +17,10 @@ func NewUserRepository(q postgres.Querier) model.UserRepository {
 }
 
 func (ur *userRepository) Create(ctx context.Context, user *model.User) (uint, error) {
-	query := `INSERT INTO users (username, email, password_hash) VALUES ($1,$2,$3) RETURNING id `
+	query := `INSERT INTO users (username, email, password_hash, secret) VALUES ($1,$2,$3,$4) RETURNING id `
 
 	var id uint
-	args := []interface{}{user.Username, user.Email, user.PasswordHash}
+	args := []interface{}{user.Username, user.Email, user.PasswordHash, ""}
 	err := ur.q.QueryRowContext(ctx, query, args...).Scan(&id)
 	if err != nil {
 		switch {
